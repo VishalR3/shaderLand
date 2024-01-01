@@ -17,7 +17,7 @@ import fragmentShader from "./grassShaders/fragmentShader.glsl?raw";
 
 extend({ InstancedMesh: InstancedMesh });
 
-const GrassBed = ({ characterRef }) => {
+const GrassBed = () => {
   const meshRef = useRef();
   const PARAMS = useControls("GrassBed", {
     gridDistance: {
