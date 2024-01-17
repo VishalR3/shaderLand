@@ -5,6 +5,7 @@ import Base from "./components/Terrain/Base";
 import ThreeContainer from "./components/ThreeContainer";
 import GrassBase from "./components/GrassAgain/GrassBase";
 import InstanceBase from "./components/Instancing/InstanceBase";
+import DAGBase from "./components/DAG/DAGBase";
 
 function App() {
   const { scene } = useControls("Scene", {
@@ -16,6 +17,7 @@ function App() {
         "Planet",
         "grassBase",
         "Instancing",
+        "DAG",
       ],
       value: "grassBase",
     },
@@ -34,6 +36,8 @@ function App() {
         return <GrassBase />;
       case "Instancing":
         return <InstanceBase />;
+      case "DAG":
+        return <DAGBase />;
     }
   };
   return (

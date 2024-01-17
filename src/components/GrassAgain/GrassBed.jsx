@@ -14,15 +14,15 @@ import { useEffect, useMemo, useRef } from "react";
 import { extend, useFrame } from "@react-three/fiber";
 import vertexShader from "./grassShaders/vertexShader.glsl?raw";
 import fragmentShader from "./grassShaders/fragmentShader.glsl?raw";
+import { createNoise2D } from "simplex-noise";
+
+const noise2D = createNoise2D();
 
 extend({ InstancedMesh: InstancedMesh });
 
-const GrassBed = () => {
+const GrassBed = ({ grassPositions, scale }) => {
   const meshRef = useRef();
   const PARAMS = useControls("GrassBed", {
-    gridDistance: {
-      value: 80,
-    },
     gridSize: {
       value: 0.1,
       min: 0.1,
@@ -48,23 +48,36 @@ const GrassBed = () => {
     uniforms: uniforms,
     side: DoubleSide,
   });
-  const count = (PARAMS.gridDistance * PARAMS.gridDistance) / PARAMS.gridSize;
+  const count = (scale * scale) / PARAMS.gridSize;
 
   const matrix = new Matrix4();
   useEffect(() => {
     if (meshRef.current) {
       for (let i = 0; i < count; i++) {
-        const position = new Vector3(
-          (Math.random() - 0.5) * PARAMS.gridDistance,
-          0.5,
-          (Math.random() - 0.5) * PARAMS.gridDistance
-        );
+        let x = (Math.random() - 0.5) * scale;
+        let z = (Math.random() - 0.5) * scale;
+        let y;
+        try {
+          y =
+            0.75 +
+            grassPositions.current[Math.ceil(x + -1 + scale / 2)][
+              Math.ceil(z + -1 + scale / 2)
+            ];
+
+          if (y == 0.75) throw new Error("Got Value 0");
+        } catch (e) {
+          y = 2 * noise2D(x / 50, z / 50);
+          y += 4 * noise2D(x / 100, z / 100);
+          y += 0.2 * noise2D(x / 10, z / 10);
+        }
+        const position = new Vector3(x, y, z);
         matrix.setPosition(position);
         meshRef.current.setMatrixAt(i, matrix);
       }
       meshRef.current.instanceMatrix.needsUpdate = true;
     }
-  }, [meshRef, PARAMS]);
+  }, [meshRef, PARAMS, scale]);
+
   useFrame((state) => {
     const { clock } = state;
     material.uniforms.u_time.value = clock.getElapsedTime();
