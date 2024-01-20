@@ -52,7 +52,7 @@ const Terrain = () => {
           itemSize={1}
         />
       </bufferGeometry>
-      <meshBasicMaterial color={"red"} side={2} />
+      <meshBasicMaterial color={"red"} side={2} wireframe />
     </mesh>
   );
 };

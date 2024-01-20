@@ -64,7 +64,7 @@ const GrassBed = ({ grassPositions, scale }) => {
               Math.ceil(z + -1 + scale / 2)
             ];
 
-          if (y == 0.75) throw new Error("Got Value 0");
+          // if (y == 0.75) throw new Error("Got Value 0");
         } catch (e) {
           y = 2 * noise2D(x / 50, z / 50);
           y += 4 * noise2D(x / 100, z / 100);

@@ -6,6 +6,7 @@ import ThreeContainer from "./components/ThreeContainer";
 import GrassBase from "./components/GrassAgain/GrassBase";
 import InstanceBase from "./components/Instancing/InstanceBase";
 import DAGBase from "./components/DAG/DAGBase";
+import LightDarkBase from "./components/LightDarkBase/LightDarkBase";
 
 function App() {
   const { scene } = useControls("Scene", {
@@ -18,6 +19,7 @@ function App() {
         "grassBase",
         "Instancing",
         "DAG",
+        "lightDark",
       ],
       value: "grassBase",
     },
@@ -38,6 +40,8 @@ function App() {
         return <InstanceBase />;
       case "DAG":
         return <DAGBase />;
+      case "lightDark":
+        return <LightDarkBase />;
     }
   };
   return (
