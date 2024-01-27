@@ -62,7 +62,7 @@ const GrassBase = () => {
         setCameraLookPosition={setCameraLookPosition}
       /> */}
       <Stats />
-      {/* <Leva hidden /> */}
+      <Leva hidden />
     </Canvas>
   );
 };
