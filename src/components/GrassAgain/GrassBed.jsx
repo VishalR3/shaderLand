@@ -14,13 +14,11 @@ import { useEffect, useMemo, useRef } from "react";
 import { extend, useFrame } from "@react-three/fiber";
 import vertexShader from "./grassShaders/vertexShader.glsl?raw";
 import fragmentShader from "./grassShaders/fragmentShader.glsl?raw";
-import { createNoise2D } from "simplex-noise";
-
-const noise2D = createNoise2D();
+import { noise2D } from "./utils";
 
 extend({ InstancedMesh: InstancedMesh });
 
-const GrassBed = ({ grassPositions, scale }) => {
+const GrassBed = ({ scale }) => {
   const meshRef = useRef();
   const PARAMS = useControls("GrassBed", {
     gridSize: {
@@ -38,6 +36,15 @@ const GrassBed = ({ grassPositions, scale }) => {
       u_time: {
         value: 0.0,
       },
+      fogColor: {
+        value: new Vector3(1.0, 1.0, 1.0),
+      },
+      fogNear: {
+        value: 20,
+      },
+      fogFar: {
+        value: 300,
+      },
     }),
     []
   );
@@ -49,6 +56,7 @@ const GrassBed = ({ grassPositions, scale }) => {
     side: DoubleSide,
   });
   const count = (scale * scale) / PARAMS.gridSize;
+  const grassPositions = [];
 
   const matrix = new Matrix4();
   useEffect(() => {
@@ -56,21 +64,12 @@ const GrassBed = ({ grassPositions, scale }) => {
       for (let i = 0; i < count; i++) {
         let x = (Math.random() - 0.5) * scale;
         let z = (Math.random() - 0.5) * scale;
-        let y;
-        try {
-          y =
-            0.75 +
-            grassPositions.current[Math.ceil(x + -1 + scale / 2)][
-              Math.ceil(z + -1 + scale / 2)
-            ];
-
-          // if (y == 0.75) throw new Error("Got Value 0");
-        } catch (e) {
-          y = 2 * noise2D(x / 50, z / 50);
-          y += 4 * noise2D(x / 100, z / 100);
-          y += 0.2 * noise2D(x / 10, z / 10);
-        }
+        let y = 2 * noise2D(x / 50, z / 50);
+        y += 4 * noise2D(x / 100, z / 100);
+        y += 0.2 * noise2D(x / 10, z / 10);
+        y += 0.75;
         const position = new Vector3(x, y, z);
+        // grassPositions.push(position);
         matrix.setPosition(position);
         meshRef.current.setMatrixAt(i, matrix);
       }

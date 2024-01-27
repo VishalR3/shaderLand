@@ -11,15 +11,15 @@ const calculateIdealOffset = (character, baseVector) => {
   idealOffset.add(character.position);
   return idealOffset;
 };
-const calculateIdealLookAt = (character, baseVector) => {
+const calculateIdealLookAt = (character, camera, baseVector) => {
   const idealLookAt = baseVector;
   // const idealLookAt = new Vector3(0, 2.0, 10.0);
-  idealLookAt.applyQuaternion(character.quaternion);
+  idealLookAt.applyQuaternion(camera.quaternion);
   idealLookAt.add(character.position);
   return idealLookAt;
 };
 
-const Character = ({ characterRef = false }) => {
+const CharacterMove = ({ cameraLookPosition, setCameraLookPosition }) => {
   const mesh = useRef();
   const { offsetVector, lookAtVector, normalSpeed, runningSpeed } = useControls(
     "Character",
@@ -108,7 +108,7 @@ const Character = ({ characterRef = false }) => {
     const controlObject = mesh.current;
     const _Q = new Quaternion();
     const _A = new Vector3();
-    const _R = controlObject.quaternion.clone();
+    const _R = camera.quaternion.clone();
 
     const userData = mesh.current.userData;
     const movementSpeed = userData.movementSpeed || normalSpeed;
@@ -132,15 +132,15 @@ const Character = ({ characterRef = false }) => {
     }
     if (userData.moveUp) character.translateY(-actualMoveSpeed);
     else if (userData.moveDown) character.translateY(actualMoveSpeed);
-    else {
-      let x = character.position.x;
-      let z = character.position.z;
-      character.position.y =
-        2 +
-        2 * noise2D(x / 50, z / 50) +
-        4 * noise2D(x / 100, z / 100) +
-        0.2 * noise2D(x / 10, z / 10);
-    }
+    // else {
+    //   let x = character.position.x;
+    //   let z = character.position.z;
+    //   character.position.y =
+    //     2 +
+    //     2 * noise2D(x / 50, z / 50) +
+    //     4 * noise2D(x / 100, z / 100) +
+    //     0.2 * noise2D(x / 10, z / 10);
+    // }
     mesh.current.quaternion.copy(_R);
 
     // Camera Follow
@@ -150,17 +150,20 @@ const Character = ({ characterRef = false }) => {
     );
     const idealLookAt = calculateIdealLookAt(
       mesh.current,
+      camera,
       new Vector3().copy(lookAtVector)
     );
     const t = 0.15;
-    const currentPosition = new Vector3().copy(camera.position);
-    const currentLookAt = new Vector3().copy(character.position);
-    currentPosition.lerp(idealOffset, t);
+    // const currentPosition = new Vector3().copy(camera.position);
+    // const currentLookAt = new Vector3().copy(character.position);
+    // currentPosition.lerp(idealOffset, t);
+    // currentLookAt.lerp(idealLookAt, t);
+    const currentLookAt = new Vector3().fromArray(cameraLookPosition);
     currentLookAt.lerp(idealLookAt, t);
+    setCameraLookPosition(currentLookAt.toArray());
 
-    camera.position.copy(currentPosition);
-    camera.lookAt(currentLookAt);
-    if (characterRef) characterRef.current = mesh.current;
+    // camera.position.copy(currentPosition);
+    // camera.lookAt(currentLookAt);
   });
 
   return (
@@ -171,4 +174,4 @@ const Character = ({ characterRef = false }) => {
   );
 };
 
-export default Character;
+export default CharacterMove;

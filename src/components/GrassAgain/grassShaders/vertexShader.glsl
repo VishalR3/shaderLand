@@ -2,6 +2,7 @@ uniform float u_rand;
 uniform float u_time;
 
 varying vec2 vUv;
+varying float vFogDepth;
 
 vec3 makeGrassBladeShape(){
   vec3 newPosition = position;
@@ -92,7 +93,6 @@ mat3 rotateAxis(vec3 axis, float angle) {
 
 
 void main() {
-
   vUv = uv;
   vec3 newPosition = makeGrassBladeShape();
   vec3 grassOffset = (instanceMatrix * vec4(newPosition,1.0)).xyz;
@@ -126,6 +126,7 @@ void main() {
 
   vec4 modelPosition = modelMatrix * instanceMatrix *vec4(newPosition, 1.0);
   vec4 viewPosition = viewMatrix * modelPosition;
+  vFogDepth = - viewPosition.z;
   vec4 projectedPosition = projectionMatrix *viewPosition;
 
   gl_Position = projectedPosition;
